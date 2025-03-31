@@ -1,0 +1,90 @@
+1. Use Application Settings to Save the Color
+Store the color in application settings so that it persists across sessions.
+
+2. Apply the Color to All Forms
+Use a static property to hold the selected color.
+
+Apply it to text controls (Label, TextBox, etc.) when a form loads.
+
+Step-by-Step Implementation
+Step 1: Add a Color Setting in App Settings
+Open Solution Explorer → Right-click Properties → Click Settings.
+
+Add a new setting:
+
+Name: TextColor
+
+Type: string
+
+Scope: User
+
+Default Value: Black (or any color)
+
+Step 2: Create a Static Helper Class
+Create a helper class to manage the color setting.
+
+csharp
+Copy
+Edit
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+public static class ThemeManager
+{
+    public static Color TextColor
+    {
+        get
+        {
+            return ColorTranslator.FromHtml(Properties.Settings.Default.TextColor);
+        }
+        set
+        {
+            Properties.Settings.Default.TextColor = ColorTranslator.ToHtml(value);
+            Properties.Settings.Default.Save();
+        }
+    }
+
+    public static void ApplyTheme(Control control)
+    {
+        foreach (Control c in control.Controls)
+        {
+            if (c is Label || c is TextBox || c is Button)
+                c.ForeColor = TextColor;
+
+            if (c.HasChildren)
+                ApplyTheme(c);
+        }
+    }
+}
+Step 3: Add a Color Picker to Change the Color
+On your main form (or settings form), add a Button and ColorDialog.
+
+csharp
+Copy
+Edit
+private void btnChangeColor_Click(object sender, EventArgs e)
+{
+    ColorDialog colorDialog = new ColorDialog();
+    if (colorDialog.ShowDialog() == DialogResult.OK)
+    {
+        ThemeManager.TextColor = colorDialog.Color; // Save selected color
+        ThemeManager.ApplyTheme(this); // Apply to current form
+    }
+}
+Step 4: Apply the Color to All Forms
+In the Load event of each form:
+
+csharp
+Copy
+Edit
+private void Form1_Load(object sender, EventArgs e)
+{
+    ThemeManager.ApplyTheme(this);
+}
+How It Works
+When the user selects a color, it's saved in application settings.
+
+Every form applies the saved color when it loads.
+
+The color persists across app restarts.
