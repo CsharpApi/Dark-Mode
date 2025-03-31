@@ -1,0 +1,118 @@
+🛠️ Steps to Implement Dark Mode
+1️⃣ Use Application Settings to Store Dark Mode Preference
+This ensures that the dark mode setting is saved even after the app is closed.
+
+2️⃣ Create a Static Theme Manager
+A helper class will manage theme settings and apply them across all forms.
+
+3️⃣ Add a Toggle Switch or Button for Dark Mode
+Let users enable or disable dark mode.
+
+4️⃣ Apply Dark Mode to All Forms
+Ensure that all forms use the stored dark mode preference when they load.
+
+📌 Step-by-Step Implementation
+Step 1: Add a Setting in Application Settings
+Open Solution Explorer → Right-click Properties → Click Settings.
+
+Add a new setting:
+
+Name: IsDarkMode
+
+Type: bool
+
+Scope: User
+
+Default Value: False (Light Mode by default)
+
+Step 2: Create a Static ThemeManager Class
+This will handle applying the dark mode settings to all forms.
+
+csharp
+Copy
+Edit
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+
+public static class ThemeManager
+{
+    public static bool IsDarkMode
+    {
+        get => Properties.Settings.Default.IsDarkMode;
+        set
+        {
+            Properties.Settings.Default.IsDarkMode = value;
+            Properties.Settings.Default.Save();
+        }
+    }
+
+    public static void ApplyTheme(Form form)
+    {
+        form.BackColor = IsDarkMode ? Color.Black : Color.White;
+
+        foreach (Control control in form.Controls)
+        {
+            if (control is Label || control is Button || control is TextBox)
+            {
+                control.ForeColor = IsDarkMode ? Color.White : Color.Black;
+                control.BackColor = IsDarkMode ? Color.FromArgb(30, 30, 30) : Color.White;
+            }
+
+            if (control.HasChildren)
+            {
+                ApplyThemeToChildren(control);
+            }
+        }
+    }
+
+    private static void ApplyThemeToChildren(Control parent)
+    {
+        foreach (Control child in parent.Controls)
+        {
+            if (child is Label || child is Button || child is TextBox)
+            {
+                child.ForeColor = IsDarkMode ? Color.White : Color.Black;
+                child.BackColor = IsDarkMode ? Color.FromArgb(30, 30, 30) : Color.White;
+            }
+
+            if (child.HasChildren)
+            {
+                ApplyThemeToChildren(child);
+            }
+        }
+    }
+}
+Step 3: Add a Toggle Button for Dark Mode
+In your main form (or a settings form), add a CheckBox or Button to toggle dark mode.
+
+For a CheckBox
+csharp
+Copy
+Edit
+private void chkDarkMode_CheckedChanged(object sender, EventArgs e)
+{
+    ThemeManager.IsDarkMode = chkDarkMode.Checked;
+    ThemeManager.ApplyTheme(this);
+}
+Set chkDarkMode.Checked = ThemeManager.IsDarkMode; in the form's Load event.
+
+For a Button
+csharp
+Copy
+Edit
+private void btnToggleDarkMode_Click(object sender, EventArgs e)
+{
+    ThemeManager.IsDarkMode = !ThemeManager.IsDarkMode;
+    ThemeManager.ApplyTheme(this);
+}
+Step 4: Apply Dark Mode to All Forms
+In every form's Load event, apply the theme:
+
+csharp
+Copy
+Edit
+private void Form1_Load(object sender, EventArgs e)
+{
+    ThemeManager.ApplyTheme(this);
+}
