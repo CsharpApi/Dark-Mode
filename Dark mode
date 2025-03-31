@@ -1,0 +1,89 @@
+Class
+public static class ThemeManager
+{
+    public static bool IsDarkMode { get; set; } = false;
+
+    public static void ApplyTheme(Form form)
+    {
+        if (IsDarkMode)
+        {
+            form.BackColor = Color.FromArgb(45, 45, 48);
+            form.ForeColor = Color.White;
+        }
+        else
+        {
+            form.BackColor = Color.White;
+            form.ForeColor = Color.Black;
+        }
+
+        // Apply the theme to all controls in the form
+        foreach (Control control in form.Controls)
+        {
+            ApplyThemeToControl(control);
+        }
+    }
+
+    private static void ApplyThemeToControl(Control control)
+    {
+        if (IsDarkMode)
+        {
+            control.BackColor = Color.FromArgb(45, 45, 48);
+            control.ForeColor = Color.White;
+        }
+        else
+        {
+            control.BackColor = Color.White;
+            control.ForeColor = Color.Black;
+        }
+
+        // Apply theme to child controls (e.g., panels, group boxes)
+        foreach (Control child in control.Controls)
+        {
+            ApplyThemeToControl(child);
+        }
+    }
+}
+Button Click
+private void btnToggleDarkMode_Click(object sender, EventArgs e)
+{
+    ThemeManager.IsDarkMode = !ThemeManager.IsDarkMode; // Toggle state
+    ThemeManager.ApplyTheme(this); // Apply theme to current form
+
+    // Apply theme to other open forms
+    foreach (Form form in Application.OpenForms)
+    {
+        ThemeManager.ApplyTheme(form);
+    }
+}
+Add in each forms load event
+private void Form2_Load(object sender, EventArgs e)
+{
+    ThemeManager.ApplyTheme(this);
+}
+
+
+
+4. Persist the Dark Mode Setting (Optional)
+If you want the setting to persist between app launches, save it in the app's settings:
+
+Go to Properties > Settings.settings in Solution Explorer.
+
+Add a bool setting called DarkMode.
+
+Modify ThemeManager to load and save the setting:
+
+csharp
+Copy
+Edit
+public static class ThemeManager
+{
+    public static bool IsDarkMode 
+    { 
+        get => Properties.Settings.Default.DarkMode;
+        set 
+        { 
+            Properties.Settings.Default.DarkMode = value;
+            Properties.Settings.Default.Save();
+        }
+    }
+}
