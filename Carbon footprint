@@ -1,0 +1,22 @@
+private void btnCalculate_Click(object sender, EventArgs e)
+{
+  // Define our Emission factors ( kg Co2 per unit of measurement) 
+  double electricityEmissionFactor = 0.5; // per kWh
+  double fuelEmissionFactor = 2.3; // per liter 
+  doubletransportEmissionFactor = 0.1 // per km
+
+  // retrieve users inputs from boxes
+  double electricityUsage = double.Parase(txtElectricity.Text);
+  double fuelUsage = double.Parse(txtFuel.Text);
+  double transportUsage = double.Parse(txtTransport.Text);
+
+  //Calculate Emission
+  double electricityEmission = electricityUsage * electricityEmissionFactor;
+  double fuelEmission = fuelUsage * fuelEmissionFactor;
+  double transportEmission = transportUsage * transportEmissionFactor;
+
+  //Calculate Total Emission
+  double totalEmission = electricityEmission + fuelEmission + transportEmission;
+
+  lblResult.Text = $"Total Carbon Footprint:{totalEmission:F2} kg CO2";
+}
