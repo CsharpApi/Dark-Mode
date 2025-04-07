@@ -1,0 +1,31 @@
+make class
+HashCode
+
+using system.Security.Cryptography
+  class HashCode
+  {
+    public string PassHash(string data )
+  {
+      SHA1 sha = SHA1.Create();
+      byte[] hashdata = sha.ComputeHash(Encoding.Default.getBytes(data));
+      StringBuilder returnValue = new StringBuilder();
+
+      for (int i = 0; i < hashdata.Length; i++)
+      {
+        returnValue.Append(hashdata[i].ToString());
+      }
+      return returnValue.ToString();
+    }
+
+
+
+
+Put HashCode inside as
+Hashcode hc = new HashCode();
+
+anytime you are putting into value with .text  do
+FOR Create acount
+" hc.PassHash(txtPassword.Text));
+
+For Login
+put at top as well where public partial class is and namespace
