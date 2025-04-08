@@ -1,0 +1,102 @@
+🔧 Step 1: Add a Setting to Your Project
+Go to Project > Properties > Settings tab.
+
+Add a new setting:
+
+Name: TextScale
+
+Type: float
+
+Scope: User
+
+Value: 1.0 (default)
+
+🧠 Step 2: AppSettings.cs (Utility Class)
+csharp
+Copy
+Edit
+public static class AppSettings
+{
+    public static float TextScaleFactor
+    {
+        get => Properties.Settings.Default.TextScale;
+        set
+        {
+            Properties.Settings.Default.TextScale = value;
+            Properties.Settings.Default.Save();
+        }
+    }
+
+    public static void ApplyTextScaling(Control parent)
+    {
+        float scale = TextScaleFactor;
+
+        foreach (Control ctrl in parent.Controls)
+        {
+            if (ctrl is Label || ctrl is Button || ctrl is CheckBox || ctrl is RadioButton || ctrl is GroupBox)
+            {
+                ctrl.Font = new Font(ctrl.Font.FontFamily, ctrl.Font.Size * scale, ctrl.Font.Style);
+            }
+
+            if (ctrl.HasChildren)
+            {
+                ApplyTextScaling(ctrl);
+            }
+        }
+    }
+}
+🧩 Step 3: SettingsForm.cs – UI + Logic
+📋 Drag onto the form:
+3 RadioButtons: radioSmall, radioMedium, radioLarge
+
+1 Button: btnSave
+
+(Optional) Label: “Choose Text Size”
+
+🧑‍💻 Code for SettingsForm.cs
+csharp
+Copy
+Edit
+public partial class SettingsForm : Form
+{
+    public SettingsForm()
+    {
+        InitializeComponent();
+    }
+
+    private void SettingsForm_Load(object sender, EventArgs e)
+    {
+        // Restore the saved setting
+        float scale = AppSettings.TextScaleFactor;
+        if (scale == 1.0f)
+            radioSmall.Checked = true;
+        else if (scale == 1.25f)
+            radioMedium.Checked = true;
+        else if (scale == 1.5f)
+            radioLarge.Checked = true;
+    }
+
+    private void btnSave_Click(object sender, EventArgs e)
+    {
+        if (radioSmall.Checked)
+            AppSettings.TextScaleFactor = 1.0f;
+        else if (radioMedium.Checked)
+            AppSettings.TextScaleFactor = 1.25f;
+        else if (radioLarge.Checked)
+            AppSettings.TextScaleFactor = 1.5f;
+
+        MessageBox.Show("Text scaling preference saved.\nRestart forms to apply changes.", 
+            "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        this.Close();
+    }
+}
+🏁 Step 4: Apply Scaling in Any Form
+In any other form, like your MainForm or ReservationForm, call this on load:
+
+csharp
+Copy
+Edit
+private void MainForm_Load(object sender, EventArgs e)
+{
+    AppSettings.ApplyTextScaling(this);
+}
