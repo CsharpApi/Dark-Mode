@@ -1,0 +1,92 @@
+Date and Time Picker – For selecting appointment time.
+
+Type Selector – Dropdown or radio buttons for “Installation” or “Consultation”.
+
+Availability Check – Prevent double bookings.
+
+Form Fields – For phone number and address.
+
+Save to MySQL – Insert validated data into the database.
+
+🛠️ Basic Form Design
+Here’s how your WinForm might look:
+
+DateTimePicker → for date & time
+
+ComboBox or RadioButton group → to select “Installation” or “Consultation”
+
+TextBox → Phone Number
+
+TextBox → Address
+
+Button → Submit/Reserve
+
+
+
+
+
+
+
+private void btnReserve_Click(object sender, EventArgs e)
+{
+    DateTime selectedDate = dateTimePicker.Value;
+    string type = comboBoxType.SelectedItem?.ToString();
+    string phone = txtPhone.Text.Trim(); // Now optional
+    string address = txtAddress.Text.Trim();
+
+    // Validation (phone is optional)
+    if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(address))
+    {
+        MessageBox.Show("Please fill in all required fields (Type and Address).", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
+    }
+
+    if (selectedDate < DateTime.Now)
+    {
+        MessageBox.Show("You cannot select a past date/time.", "Invalid Date", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        return;
+    }
+
+    try
+    {
+        string connStr = "server=your_server;user=your_user;password=your_pass;database=your_db;";
+        using (MySqlConnection conn = new MySqlConnection(connStr))
+        {
+            conn.Open();
+
+            string checkQuery = "SELECT COUNT(*) FROM reservations WHERE reservation_datetime = @datetime";
+            using (MySqlCommand checkCmd = new MySqlCommand(checkQuery, conn))
+            {
+                checkCmd.Parameters.AddWithValue("@datetime", selectedDate);
+                int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+                if (count > 0)
+                {
+                    MessageBox.Show("This time is already reserved. Please choose another.", "Time Slot Taken", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+            }
+
+            string insertQuery = @"INSERT INTO reservations (reservation_datetime, type, phone, address) 
+                                   VALUES (@datetime, @type, @phone, @address)";
+            using (MySqlCommand insertCmd = new MySqlCommand(insertQuery, conn))
+            {
+                insertCmd.Parameters.AddWithValue("@datetime", selectedDate);
+                insertCmd.Parameters.AddWithValue("@type", type);
+                insertCmd.Parameters.AddWithValue("@phone", string.IsNullOrEmpty(phone) ? (object)DBNull.Value : phone);
+                insertCmd.Parameters.AddWithValue("@address", address);
+
+                insertCmd.ExecuteNonQuery();
+            }
+
+            MessageBox.Show("Reservation saved successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+    }
+    catch (MySqlException ex)
+    {
+        MessageBox.Show($"Database error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    }
+}
