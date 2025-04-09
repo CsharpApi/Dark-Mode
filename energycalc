@@ -15,14 +15,20 @@ Cost: Show the estimated cost based on the user’s cost per kWh input.
 
 Switching appliances: When the user switches appliances, recalculate the values.
 
-Form Setup:
+
+
+
+
+
+
+**Form Setup:
 A ComboBox for the appliance list.
 
 A NumericUpDown or TextBox for hours used per day.
 
 Labels to display the calculated values (daily, monthly, yearly kWh, and cost).
 
-A Button to trigger the calculation.
+A Button to trigger the calculation.**
 
 
 
