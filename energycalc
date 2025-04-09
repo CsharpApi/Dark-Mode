@@ -1,0 +1,267 @@
+Device selection: Let the user pick one appliance from a dropdown list (ComboBox).
+
+Hours input: The user enters the number of hours per day the selected appliance is used (TextBox or NumericUpDown).
+USE NUMERIC UPDOWN FOR ERROR HANDLING
+
+Calculation: Once the user selects the appliance and enters hours used per day, calculate:
+
+kWh per day
+
+kWh per month
+
+kWh per year
+
+Cost: Show the estimated cost based on the user’s cost per kWh input.
+
+Switching appliances: When the user switches appliances, recalculate the values.
+
+Form Setup:
+A ComboBox for the appliance list.
+
+A NumericUpDown or TextBox for hours used per day.
+
+Labels to display the calculated values (daily, monthly, yearly kWh, and cost).
+
+A Button to trigger the calculation.
+
+
+
+using System;
+using System.Windows.Forms;
+
+namespace EnergyCalculatorApp
+{
+    public partial class EnergyPage : Form
+    {
+        // Appliance specifications (in kW)
+        private const double TV_KWH = 0.07;
+        private const double FRIDGE_KW = 0.15; // Runs 24 hours/day
+        private const double DISHWASHER_KW = 1.6;
+        private const double TOASTER_KW = 1.0;
+
+        public EnergyPage()
+        {
+            InitializeComponent();
+        }
+
+        private void EnergyPage_Load(object sender, EventArgs e)
+        {
+            // Default cost per kWh in UK (can be changed)
+            numCostPerKwh.Value = 0.34M; // Set default to 34p per kWh (UK average)
+
+            // Populate the appliance list (ComboBox)
+            comboBoxAppliance.Items.Add("TV");
+            comboBoxAppliance.Items.Add("Fridge");
+            comboBoxAppliance.Items.Add("Dishwasher");
+            comboBoxAppliance.Items.Add("Toaster");
+
+            // Set default appliance
+            comboBoxAppliance.SelectedIndex = 0; // Default to TV
+        }
+
+        private void btnCalculate_Click(object sender, EventArgs e)
+        {
+            string selectedAppliance = comboBoxAppliance.SelectedItem.ToString();
+            double hoursUsedPerDay = (double)numHoursUsed.Value;
+
+            double kWhPerDay = 0;
+            double kWhPerMonth = 0;
+            double kWhPerYear = 0;
+            double costPerKwh = (double)numCostPerKwh.Value;
+
+            // Calculate energy usage based on selected appliance
+            switch (selectedAppliance)
+            {
+                case "TV":
+                    kWhPerDay = hoursUsedPerDay * TV_KWH;
+                    break;
+                case "Fridge":
+                    kWhPerDay = 24 * FRIDGE_KW; // Fridge is always on
+                    break;
+                case "Dishwasher":
+                    kWhPerDay = hoursUsedPerDay * DISHWASHER_KW;
+                    break;
+                case "Toaster":
+                    kWhPerDay = hoursUsedPerDay * TOASTER_KW;
+                    break;
+            }
+
+            // Calculate monthly and yearly usage
+            kWhPerMonth = kWhPerDay * 30;
+            kWhPerYear = kWhPerDay * 365;
+
+            // Calculate cost in pounds (£)
+            double dailyCost = kWhPerDay * costPerKwh;
+            double monthlyCost = kWhPerMonth * costPerKwh;
+            double yearlyCost = kWhPerYear * costPerKwh;
+
+            // Display the results
+            lblDailyUsage.Text = $"Daily Usage: {kWhPerDay:F2} kWh";
+            lblMonthlyUsage.Text = $"Monthly Usage: {kWhPerMonth:F2} kWh";
+            lblYearlyUsage.Text = $"Yearly Usage: {kWhPerYear:F2} kWh";
+
+            lblDailyCost.Text = $"Daily Cost: £{dailyCost:F2}";
+            lblMonthlyCost.Text = $"Monthly Cost: £{monthlyCost:F2}";
+            lblYearlyCost.Text = $"Yearly Cost: £{yearlyCost:F2}";
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OR
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+using System;
+using System.Windows.Forms;
+
+namespace EnergyCalculatorApp
+{
+    public partial class EnergyPage : Form
+    {
+        // Appliance specifications (in kW)
+        private const double TV_KWH = 0.07;
+        private const double FRIDGE_KW = 0.15; // Runs 24 hours/day
+        private const double DISHWASHER_KW = 1.6;
+        private const double TOASTER_KW = 1.0;
+
+        public EnergyPage()
+        {
+            InitializeComponent();
+        }
+
+        private void EnergyPage_Load(object sender, EventArgs e)
+        {
+            // Default cost per kWh in UK (can be changed)
+            numCostPerKwh.Value = 0.34M; // Set default to 34p per kWh (UK average)
+
+            // Populate the appliance list (ComboBox)
+            comboBoxAppliance.Items.Add("TV");
+            comboBoxAppliance.Items.Add("Fridge");
+            comboBoxAppliance.Items.Add("Dishwasher");
+            comboBoxAppliance.Items.Add("Toaster");
+
+            // Set default appliance
+            comboBoxAppliance.SelectedIndex = 0; // Default to TV
+        }
+
+        private void btnCalculate_Click(object sender, EventArgs e)
+        {
+            // Check if an appliance is selected
+            if (comboBoxAppliance.SelectedIndex == -1)
+            {
+                MessageBox.Show("Please select an appliance from the list.", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Check if hours used is greater than 0
+            double hoursUsedPerDay = (double)numHoursUsed.Value;
+            if (hoursUsedPerDay <= 0)
+            {
+                MessageBox.Show("Please enter the number of hours the appliance is used per day.", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string selectedAppliance = comboBoxAppliance.SelectedItem.ToString();
+
+            double kWhPerDay = 0;
+            double kWhPerMonth = 0;
+            double kWhPerYear = 0;
+            double costPerKwh = (double)numCostPerKwh.Value;
+
+            // Calculate energy usage based on selected appliance
+            switch (selectedAppliance)
+            {
+                case "TV":
+                    kWhPerDay = hoursUsedPerDay * TV_KWH;
+                    break;
+                case "Fridge":
+                    kWhPerDay = 24 * FRIDGE_KW; // Fridge is always on
+                    break;
+                case "Dishwasher":
+                    kWhPerDay = hoursUsedPerDay * DISHWASHER_KW;
+                    break;
+                case "Toaster":
+                    kWhPerDay = hoursUsedPerDay * TOASTER_KW;
+                    break;
+            }
+
+            // Calculate monthly and yearly usage
+            kWhPerMonth = kWhPerDay * 30;
+            kWhPerYear = kWhPerDay * 365;
+
+            // Calculate cost in pounds (£)
+            double dailyCost = kWhPerDay * costPerKwh;
+            double monthlyCost = kWhPerMonth * costPerKwh;
+            double yearlyCost = kWhPerYear * costPerKwh;
+
+            // Display the results
+            lblDailyUsage.Text = $"Daily Usage: {kWhPerDay:F2} kWh";
+            lblMonthlyUsage.Text = $"Monthly Usage: {kWhPerMonth:F2} kWh";
+            lblYearlyUsage.Text = $"Yearly Usage: {kWhPerYear:F2} kWh";
+
+            lblDailyCost.Text = $"Daily Cost: £{dailyCost:F2}";
+            lblMonthlyCost.Text = $"Monthly Cost: £{monthlyCost:F2}";
+            lblYearlyCost.Text = $"Yearly Cost: £{yearlyCost:F2}";
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    Key Changes:
+ComboBox Validation:
+
+We check if the user has selected an appliance by checking comboBoxAppliance.SelectedIndex. If it is -1 (no item selected), we show an error message.
+
+NumericUpDown Validation:
+
+We check if the user has entered a valid number of hours greater than 0 using numHoursUsed.Value. If the value is 0 or less, we show an error message.
+
